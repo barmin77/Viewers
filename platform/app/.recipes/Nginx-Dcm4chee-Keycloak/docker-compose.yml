@@ -1,4 +1,4 @@
-version: '3.8'
+# version: '3.8'
 
 services:
   ldap:
@@ -68,7 +68,12 @@ services:
     depends_on:
       keycloak:
         condition: service_healthy
-    restart: on-failure
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     networks:
       - default
     extra_hosts:

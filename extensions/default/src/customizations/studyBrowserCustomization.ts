@@ -20,17 +20,17 @@ export default {
   ],
   'studyBrowser.sortFunctions': [
     {
-      label: i18n.t('StudyBrowser:Series Number'),
-      sortFunction: (a, b) => {
-        return a?.SeriesNumber - b?.SeriesNumber;
-      },
-    },
-    {
       label: i18n.t('StudyBrowser:Series Date'),
       sortFunction: (a, b) => {
         const dateA = new Date(formatDate(a?.SeriesDate));
         const dateB = new Date(formatDate(b?.SeriesDate));
         return dateB.getTime() - dateA.getTime();
+      },
+    },
+    {
+      label: i18n.t('StudyBrowser:Series Number'),
+      sortFunction: (a, b) => {
+        return a?.SeriesNumber - b?.SeriesNumber;
       },
     },
   ],

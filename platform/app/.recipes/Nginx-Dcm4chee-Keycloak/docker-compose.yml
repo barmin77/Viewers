@@ -11,8 +11,8 @@ services:
       - "389:389"
     env_file: docker-compose.env
     volumes:
-      - ~/dcm4chee-arc/ldap:/var/lib/ldap
-      - ~/dcm4chee-arc/slapd.d:/etc/ldap/slapd.d
+      - /opt/dcm4chee-arc/ldap:/var/lib/ldap
+      - /opt/dcm4chee-arc/slapd.d:/etc/ldap/slapd.d
 
   db:
     image: dcm4che/postgres-dcm4chee:14.5-29
@@ -26,7 +26,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-      - ~/dcm4chee-arc/db:/var/lib/postgresql/data
+      - /opt/dcm4chee-arc/db:/var/lib/postgresql/data
 
   arc:
     image: dcm4che/dcm4chee-arc-psql:5.29.0
@@ -53,8 +53,8 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-      - ~/dcm4chee-arc/wildfly:/opt/wildfly/standalone
-      - ~/dcm4chee-arc/storage:/storage
+      - /opt/dcm4chee-arc/wildfly:/opt/wildfly/standalone
+      - /opt/dcm4chee-arc/storage:/storage
 
   ohif_viewer:
     build:
@@ -95,13 +95,13 @@ services:
       KC_DB_SCHEMA: public
       KC_DB_USERNAME: keycloak
       KC_DB_PASSWORD: password
-      KC_HOSTNAME_ADMIN_URL: http://YOUR_DOMAIN/keycloak/
-      KC_HOSTNAME_URL: http://YOUR_DOMAIN/keycloak/
+      KC_HOSTNAME_ADMIN_URL: https://s2.berger-medit.eu/keycloak/
+      KC_HOSTNAME_URL: https://s2.berger-medit.eu/keycloak/
       KC_HOSTNAME_STRICT_BACKCHANNEL: true
       KC_HOSTNAME_STRICT_HTTPS: false
       KC_HTTP_ENABLED: true
       KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin1.
       KC_HEALTH_ENABLED: true
       KC_METRICS_ENABLED: true
       KC_PROXY: edge
@@ -120,11 +120,7 @@ services:
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "exec 3<>/dev/tcp/YOUR_DOMAIN/8080;echo -e \"GET /health/ready HTTP/1.1\r\nhost: http://localhost\r\nConnection: close\r\n\r\n\" >&3;grep \"HTTP/1.1 200 OK\" <&3"
-        ]
+      test: ['CMD-SHELL', '[ -f /tmp/HealthCheck.java ] || echo "public class HealthCheck { public static void main(String[] args) throws java.lang.Throwable { System.exit(java.net.HttpURLConnection.HTTP_OK == ((java.net.HttpURLConnection)new java.net.URL(args[0]).openConnection()).getResponseCode() ? 0 : 1); } }" > /tmp/HealthCheck.java && java /tmp/HealthCheck.java http://localhost:8080/health/live']
       interval: 1s
       timeout: 5s
       retries: 10

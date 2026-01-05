@@ -24,6 +24,7 @@
   },
   "scripts": {
     "cm": "npx git-cz",
+    "prebuild": "yarn cache clean --mirror",
     "build": "lerna run build:viewer --stream",
     "build:dev": "lerna run build:dev --stream",
     "build:ci": "lerna run build:viewer:ci --stream",
